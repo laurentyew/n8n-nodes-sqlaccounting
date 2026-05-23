@@ -1,0 +1,59 @@
+{
+  "name": "n8n-nodes-sqlaccounting",
+  "version": "1.0.0",
+  "description": "n8n community node for SQL Accounting REST API (Malaysia). Credit-based usage via the SQL Accounting n8n Node platform.",
+  "keywords": [
+    "n8n-community-node-package",
+    "sql-accounting",
+    "malaysia",
+    "accounting",
+    "erp",
+    "automation"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/laurentyew/n8n-nodes-sqlaccounting",
+  "author": {
+    "name": "Laurent Yew",
+    "email": "laurentyew@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laurentyew/n8n-nodes-sqlaccounting.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/SqlAccountingApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/SqlAccounting/SqlAccounting.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.16",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.1",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "*",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "dependencies": {}
+}
