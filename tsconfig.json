@@ -6,12 +6,13 @@
     "lib": ["ES2019"],
     "outDir": "./dist",
     "rootDir": "./",
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types", "./types"],
     "esModuleInterop": true,
     "declaration": true,
     "declarationMap": true,
     "inlineSourceMap": true,
     "skipLibCheck": true
   },
-  "exclude": ["dist", "node_modules", "@types"]
+  "include": ["nodes/**/*.ts", "credentials/**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["dist", "node_modules"]
 }
