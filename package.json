@@ -13,8 +13,8 @@
   "license": "MIT",
   "homepage": "https://github.com/laurentyew/n8n-nodes-sqlaccounting",
   "author": {
-    "name": "Laurent Yew",
-    "email": "laurentyew@gmail.com"
+    "name": "Your Name",
+    "email": "your@email.com"
   },
   "repository": {
     "type": "git",
@@ -43,16 +43,21 @@
   },
   "devDependencies": {
     "@types/node": "^18.16.16",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.1",
     "gulp": "^4.0.2",
-    "n8n-workflow": "^2.16.0",
     "prettier": "^3.0.0",
     "typescript": "^5.1.3"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
-  }
+  },
+  "peerDependenciesMeta": {
+    "n8n-workflow": {
+      "optional": true
+    }
+  },
+  "dependencies": {}
 }
