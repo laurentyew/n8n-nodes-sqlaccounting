@@ -25,11 +25,13 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm install --ignore-scripts --no-optional
-
-      - name: Install n8n-workflow types only (no scripts)
-        run: npm install n8n-workflow --ignore-scripts --no-save
+      - name: Install all dependencies (no scripts, no peer deps)
+        # ignore-scripts prevents isolated-vm C++ compilation
+        # npm install resolves devDependencies only (peerDeps marked optional)
+        # We then add n8n-workflow types separately so tsc can compile
+        run: |
+          npm install --ignore-scripts --no-optional
+          npm install n8n-workflow --ignore-scripts
 
       - name: Build
         run: npm run build
