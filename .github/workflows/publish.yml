@@ -25,7 +25,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build
         run: npm run build
@@ -34,7 +34,7 @@ jobs:
         run: npm run lint
 
       - name: Run n8n community package scanner
-        run: npx @n8n/scan-community-package ./dist
+        run: npx @n8n/scan-community-package ./
         # This is the same check n8n runs when you submit for verification.
         # If this fails here it will fail at submission — fix it now.
 
