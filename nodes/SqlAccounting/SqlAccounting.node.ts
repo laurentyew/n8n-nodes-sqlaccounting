@@ -54,7 +54,6 @@ export class SqlAccounting implements INodeType {
 				})),
 				default: 'profile',
 				required: true,
-				description: 'The SQL Accounting resource to operate on.',
 			},
 
 			// ── Operation dropdown — one per resource ────────────────────────────
@@ -80,8 +79,7 @@ export class SqlAccounting implements INodeType {
 				type: 'string',
 				default: '',
 				required: true,
-				description:
-					'The CODE, DocKey, or AutoKey of the record to get, update, or delete.',
+				description: 'The CODE, DocKey, or AutoKey of the record to get, update, or delete',
 				displayOptions: { show: { operation: OPS_WITH_PATH_PARAM } },
 			},
 
@@ -102,8 +100,7 @@ export class SqlAccounting implements INodeType {
 				name: 'returnAll',
 				type: 'boolean',
 				default: false,
-				description:
-					'Whether to return all records by automatically looping through pages. Each page costs 1 credit.',
+				description: 'Whether to return all results or only up to a given limit',
 				displayOptions: { show: { operation: OPS_LIST } },
 			},
 
@@ -129,14 +126,14 @@ export class SqlAccounting implements INodeType {
 								type: 'string',
 								default: '',
 								placeholder: 'e.g. code, description, isactive',
-								description: 'The filter field name.',
+								description: 'The filter field name',
 							},
 							{
 								displayName: 'Value',
 								name: 'value',
 								type: 'string',
 								default: '',
-								description: 'The filter value.',
+								description: 'The filter value',
 							},
 						],
 					},
@@ -177,14 +174,14 @@ export class SqlAccounting implements INodeType {
 								type: 'string',
 								default: '',
 								placeholder: 'e.g. code, description, isactive',
-								description: 'The field name as defined in the SQL Accounting API.',
+								description: 'The field name as defined in the SQL Accounting API',
 							},
 							{
 								displayName: 'Value',
 								name: 'value',
 								type: 'string',
 								default: '',
-								description: 'The value to set for this field.',
+								description: 'The value to set for this field',
 							},
 						],
 					},
@@ -429,14 +426,12 @@ async function callEdge(
 		// Parse n8n's wrapped HTTP error to give the user a clear message
 		const msg = (error as Error).message ?? '';
 		if (msg.includes('401') || msg.includes('invalid_api_key')) {
-			throw new Error(
-				'Authentication failed. Check your Platform API Key in the credential.',
-			);
+			throw new NodeOperationError(ctx.getNode(),'Authentication failed. Check your Platform API Key in the credential.',
+);
 		}
 		if (msg.includes('402') || msg.includes('insufficient_credits')) {
-			throw new Error(
-				'Insufficient credits. Top up your balance at the portal before retrying.',
-			);
+			throw new NodeOperationError(ctx.getNode(),'Insufficient credits. Top up your balance at the portal before retrying.',
+);
 		}
 		throw error;
 	}

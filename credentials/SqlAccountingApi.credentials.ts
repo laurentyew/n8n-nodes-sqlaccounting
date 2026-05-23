@@ -68,7 +68,7 @@ export class SqlAccountingApi implements ICredentialType {
 			typeOptions: { password: true },
 			default: '',
 			required: true,
-			description: 'Your SQL Accounting API access key from the SQL Account API settings page.',
+			description: 'Your SQL Accounting API access key from the SQL Account API settings page',
 			placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.sql.my/ACCOUNTAPI',
 		},
 		{
