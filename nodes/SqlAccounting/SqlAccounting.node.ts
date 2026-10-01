@@ -1,5 +1,5 @@
 import type { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 import { ValidationError } from './errors';
 import { getOperation } from './registry';
 import { errorToJson, runOperation, SqlCredentials } from './execute/runOperation';
@@ -10,14 +10,15 @@ export class SqlAccounting implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SQL Accounting',
 		name: 'sqlAccounting',
-		icon: 'file:sqlaccounting.svg',
+		icon: { light: 'file:../../icons/sqlaccounting.svg', dark: 'file:../../icons/sqlaccounting.dark.svg' },
+		usableAsTool: true,
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
 		description: 'Interact with the SQL Accounting REST API via the SQL Accounting n8n Node service.',
 		defaults: { name: 'SQL Accounting' },
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'sqlAccountingApi', required: true }],
 		properties: buildProperties(),
 	};
@@ -45,7 +46,8 @@ export class SqlAccounting implements INodeType {
 						description: error.issues.join('\n'),
 					});
 				}
-				throw error;
+				const description = error instanceof NodeOperationError ? error.description : undefined;
+				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i, description });
 			}
 		}
 		return [output];

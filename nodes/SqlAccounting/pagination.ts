@@ -13,14 +13,18 @@ export async function fetchAllPages(
 	let offset = opts.startOffset;
 
 	for (let page = 1; page <= opts.maxPages; page++) {
-		let result: PageResult;
-		try {
-			result = await fetchPage(offset);
-		} catch (error) {
+		const outcome = await fetchPage(offset).then(
+			(value) => ({ failed: false as const, value }),
+			(error: unknown) => ({ failed: true as const, error }),
+		);
+		if (outcome.failed) {
 			// Keep the original error object (its code/field are used by continueOnFail); only prefix the message.
-			if (error instanceof Error) error.message = `Page ${page} (offset ${offset}): ${error.message}`;
-			throw error;
+			if (outcome.error instanceof Error) {
+				outcome.error.message = `Page ${page} (offset ${offset}): ${outcome.error.message}`;
+			}
+			throw outcome.error;
 		}
+		const result: PageResult = outcome.value;
 		all.push(...result.data);
 
 		const p = result.pagination;

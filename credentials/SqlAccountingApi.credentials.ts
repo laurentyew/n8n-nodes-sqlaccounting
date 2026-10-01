@@ -3,6 +3,7 @@ import type {
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
+	Icon,
 } from 'n8n-workflow';
 import { DEFAULT_REGION, DEFAULT_SERVICE, PROXY_BASE_URL } from '../nodes/SqlAccounting/config';
 
@@ -10,6 +11,11 @@ export class SqlAccountingApi implements ICredentialType {
 	name = 'sqlAccountingApi';
 	displayName = 'SQL Accounting API';
 	documentationUrl = 'https://github.com/laurentyew/n8n-nodes-sqlaccounting';
+
+	icon: Icon = {
+		light: 'file:../icons/sqlaccounting.svg',
+		dark: 'file:../icons/sqlaccounting.dark.svg',
+	};
 
 	// Injects the platform token as a Bearer header on every request made with this credential.
 	authenticate: IAuthenticateGeneric = {
@@ -59,7 +65,6 @@ export class SqlAccountingApi implements ICredentialType {
 			displayName: 'SQL Access Key',
 			name: 'sqlAccessKey',
 			type: 'string',
-			typeOptions: { password: true },
 			default: '',
 			required: true,
 			description: 'Your SQL Accounting API access key from the SQL Account API settings page',

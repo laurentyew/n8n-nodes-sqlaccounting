@@ -53,10 +53,18 @@ declare module 'n8n-workflow' {
 		typeOptions?: { [key: string]: any };
 	}
 
+	export type Icon = string | { light: string; dark: string };
+
+	export const NodeConnectionTypes: {
+		readonly Main: 'main';
+		readonly AiTool: 'ai_tool';
+	};
+
 	export interface INodeTypeDescription {
 		displayName: string;
 		name: string;
-		icon?: string;
+		icon?: Icon;
+		usableAsTool?: boolean;
 		group: string[];
 		version: number;
 		subtitle?: string;
@@ -145,6 +153,7 @@ declare module 'n8n-workflow' {
 	export interface ICredentialType {
 		name: string;
 		displayName: string;
+		icon?: Icon;
 		documentationUrl?: string;
 		properties: INodeProperties[];
 		authenticate?: IAuthenticateGeneric;
@@ -153,7 +162,7 @@ declare module 'n8n-workflow' {
 
 	export class NodeOperationError extends Error {
 		description?: string;
-		constructor(node: any, message: string, options?: { itemIndex?: number; description?: string });
+		constructor(node: any, message: string | Error, options?: { itemIndex?: number; description?: string });
 	}
 
 	export class NodeApiError extends Error {

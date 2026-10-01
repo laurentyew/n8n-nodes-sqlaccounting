@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Passes the official n8n community package scanner: themed light/dark icons for the node and credential, `usableAsTool`, `NodeConnectionTypes.Main`, no raw error re-throws, author email.
+- The access key field is no longer masked (it is an identifier, not a secret).
+
 ## 1.1.1
 
 - Published from GitHub Actions with npm provenance (trusted publishing), as required for n8n verification.

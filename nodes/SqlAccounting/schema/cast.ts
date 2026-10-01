@@ -76,15 +76,21 @@ export function buildFieldsBody(
 	return body;
 }
 
+function tryParseJson(text: string): { ok: true; value: unknown } | { ok: false } {
+	try {
+		return { ok: true, value: JSON.parse(text) };
+	} catch {
+		return { ok: false };
+	}
+}
+
 export function parseJsonObject(raw: unknown, label: string): Record<string, unknown> {
 	if (raw === undefined || raw === null || raw === '') return {};
 	let value: unknown = raw;
 	if (typeof raw === 'string') {
-		try {
-			value = JSON.parse(raw);
-		} catch {
-			throw new ValidationError([`${label} is not valid JSON.`]);
-		}
+		const parsed = tryParseJson(raw);
+		if (!parsed.ok) throw new ValidationError([`${label} is not valid JSON.`]);
+		value = parsed.value;
 	}
 	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
 		throw new ValidationError([`${label} must be a JSON object.`]);

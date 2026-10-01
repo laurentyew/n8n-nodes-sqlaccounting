@@ -15,5 +15,8 @@ module.exports = {
 	rules: {
 		'n8n-nodes-base/node-execute-block-missing-continue-on-fail': 'error',
 		'n8n-nodes-base/node-execute-block-wrong-error-thrown': 'error',
+		// The n8n community scanner requires NodeConnectionTypes.Main instead of the 'main' literal.
+		'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'off',
+		'n8n-nodes-base/node-class-description-outputs-wrong': 'off',
 	},
 };

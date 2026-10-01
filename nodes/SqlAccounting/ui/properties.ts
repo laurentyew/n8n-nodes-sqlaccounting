@@ -53,12 +53,10 @@ function resourceProperty(): INodeProperties {
 }
 
 function operationProperties(): INodeProperties[] {
-	// Defaults are computed from the registry; the lint rule cannot evaluate them.
-	// eslint-disable-next-line n8n-nodes-base/node-param-default-missing
 	return RESOURCE_DEFS.map((resource: ResourceDef) => ({
 		displayName: 'Operation',
 		name: 'operation',
-		type: 'options',
+		type: 'options' as const,
 		noDataExpression: true,
 		displayOptions: { show: { resource: [resource.value] } },
 		options: resource.operations.map((op) => ({
@@ -167,11 +165,10 @@ function filterProperties(): INodeProperties[] {
 		if (!schema || !list) continue;
 		const options = schema.fields.filter((f) => f.filterable !== false).map((f) => ({ name: f.label, value: f.name }));
 		typed.push(
-			// eslint-disable-next-line n8n-nodes-base/node-param-default-missing
 			filterCollection(filtersParam(resource.value), 'Filters', [list.key], {
 				displayName: 'Field',
 				name: 'field',
-				type: 'options',
+				type: 'options' as const,
 				options,
 				default: options[0]?.value ?? '',
 				description: 'Field to filter on',
@@ -234,18 +231,23 @@ function masterProperties(resource: string, schema: ResourceSchema): INodeProper
 }
 
 function rawBodyProperty(resource: string, mode: 'create' | 'update', extra: Record<string, Array<string | number | boolean>> = {}): INodeProperties {
-	// The create default is a per-resource template, which the lint rule cannot evaluate statically.
-	// eslint-disable-next-line n8n-nodes-base/node-param-default-missing
+	if (mode === 'create') {
+		return {
+			displayName: 'Request Body (JSON)',
+			name: rawBodyParam(resource, 'create'),
+			type: 'json',
+			default: templateFor(resource, TODAY),
+			description: 'Full JSON body. Fill in the empty values; include at least one line in sdsdocdetail.',
+			displayOptions: showOp([opKey(resource, 'create')], extra),
+		};
+	}
 	return {
 		displayName: 'Request Body (JSON)',
-		name: rawBodyParam(resource, mode),
+		name: rawBodyParam(resource, 'update'),
 		type: 'json',
-		default: mode === 'create' ? templateFor(resource, TODAY) : '{}',
-		description:
-			mode === 'create'
-				? 'Full JSON body. Fill in the empty values; include at least one line in sdsdocdetail.'
-				: 'Only the fields you want to change.',
-		displayOptions: showOp([opKey(resource, mode)], extra),
+		default: '{}',
+		description: 'Only the fields you want to change',
+		displayOptions: showOp([opKey(resource, 'update')], extra),
 	};
 }
 
