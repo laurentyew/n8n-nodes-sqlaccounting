@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- Fix: 1.1.2 failed to load on n8n releases that do not export `NodeConnectionTypes` ("Class could not be found"). The node now falls back to the `main` connection type there.
+
 ## 1.1.2
 
 - Passes the official n8n community package scanner: themed light/dark icons for the node and credential, `usableAsTool`, `NodeConnectionTypes.Main`, no raw error re-throws, author email.

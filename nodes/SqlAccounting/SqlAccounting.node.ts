@@ -6,6 +6,9 @@ import { errorToJson, runOperation, SqlCredentials } from './execute/runOperatio
 import { lookupMethods } from './lookups';
 import { buildProperties } from './ui/properties';
 
+// Older n8n releases do not export NodeConnectionTypes; fall back to the literal they used.
+const MAIN_CONNECTION = NodeConnectionTypes?.Main ?? 'main';
+
 export class SqlAccounting implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SQL Accounting',
@@ -17,8 +20,8 @@ export class SqlAccounting implements INodeType {
 		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
 		description: 'Interact with the SQL Accounting REST API via the SQL Accounting n8n Node service.',
 		defaults: { name: 'SQL Accounting' },
-		inputs: [NodeConnectionTypes.Main],
-		outputs: [NodeConnectionTypes.Main],
+		inputs: [MAIN_CONNECTION],
+		outputs: [MAIN_CONNECTION],
 		credentials: [{ name: 'sqlAccountingApi', required: true }],
 		properties: buildProperties(),
 	};
