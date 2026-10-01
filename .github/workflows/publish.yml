@@ -25,8 +25,11 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Use an npm version that supports trusted publishing (11.5.1+)
+        run: npm install -g npm@^11.5.1
+
       - name: Install dependencies
-        run: npm install --ignore-scripts --no-optional
+        run: npm install --ignore-scripts --no-optional --legacy-peer-deps
         # n8n-workflow is NOT installed — types come from ./types/n8n-workflow.d.ts
         # This avoids the isolated-vm native build entirely
 
@@ -42,7 +45,8 @@ jobs:
       - name: Run n8n community package scanner
         run: npx @n8n/scan-community-package ./
 
+      # Trusted publishing: npm authenticates this workflow through GitHub OIDC (id-token: write),
+      # so no npm token is stored. Configure it once in the npm package settings
+      # (Publish access > Trusted Publisher: laurentyew / n8n-nodes-sqlaccounting / publish.yml).
       - name: Publish to npm with provenance
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Published from GitHub Actions with npm provenance (trusted publishing), as required for n8n verification.
+- README: example workflows and authentication notes.
+
 ## 1.1.0
 
 New backend contract (`contract/CONTRACT.md` v1): subscription token, SigV4 signing on the server.

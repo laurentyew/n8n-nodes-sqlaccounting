@@ -90,6 +90,58 @@ Delete returns `{ "success": true, "resource": "...", "deleted": <id> }`.
 
 ---
 
+## Example workflows
+
+Import with **Workflow menu → Import from URL/File** (or paste into the canvas), then pick your **SQL Accounting API** credential on the node.
+
+**1. List every currency**
+
+```json
+{
+  "nodes": [
+    { "parameters": {}, "name": "Manual Trigger", "type": "n8n-nodes-base.manualTrigger", "typeVersion": 1, "position": [0, 0] },
+    {
+      "parameters": { "resource": "currency", "operation": "currency.list", "returnAll": true },
+      "name": "List currencies",
+      "type": "n8n-nodes-sqlaccounting.sqlAccounting",
+      "typeVersion": 1,
+      "position": [220, 0],
+      "credentials": { "sqlAccountingApi": { "id": "", "name": "SQL Accounting API" } }
+    }
+  ],
+  "connections": { "Manual Trigger": { "main": [[{ "node": "List currencies", "type": "main", "index": 0 }]] } }
+}
+```
+
+**2. Create a sales quotation with one line**
+
+```json
+{
+  "nodes": [
+    { "parameters": {}, "name": "Manual Trigger", "type": "n8n-nodes-base.manualTrigger", "typeVersion": 1, "position": [0, 0] },
+    {
+      "parameters": {
+        "resource": "salesquotation",
+        "operation": "salesquotation.create",
+        "salesquotation__code": "CUS-01",
+        "salesquotation__docdate": "={{ $today.toISODate() }}",
+        "salesquotation__lines": { "line": [{ "itemcode": "STK-001", "qty": "1", "unitprice": "100.00" }] }
+      },
+      "name": "Create quotation",
+      "type": "n8n-nodes-sqlaccounting.sqlAccounting",
+      "typeVersion": 1,
+      "position": [220, 0],
+      "credentials": { "sqlAccountingApi": { "id": "", "name": "SQL Accounting API" } }
+    }
+  ],
+  "connections": { "Manual Trigger": { "main": [[{ "node": "Create quotation", "type": "main", "index": 0 }]] } }
+}
+```
+
+The customer `CUS-01` and the stock item `STK-001` must already exist in SQL Account.
+
+---
+
 ## Troubleshooting
 
 | Error code | Meaning | Fix |
