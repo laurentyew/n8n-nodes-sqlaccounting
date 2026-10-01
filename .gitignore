@@ -2,3 +2,7 @@ node_modules
 dist
 *.js.map
 .env
+coverage
+
+# Local planning docs and third-party API reference (not published)
+/docs/

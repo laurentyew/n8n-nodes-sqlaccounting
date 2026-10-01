@@ -4,19 +4,14 @@ import type {
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
-
-// ── IMPORTANT: Update this URL if your Supabase project changes ──────────────
-const EDGE_FUNCTION_BASE = 'https://cqcxkvptxgslpneeobhv.supabase.co/functions/v1';
+import { DEFAULT_REGION, DEFAULT_SERVICE, PROXY_BASE_URL } from '../nodes/SqlAccounting/config';
 
 export class SqlAccountingApi implements ICredentialType {
 	name = 'sqlAccountingApi';
 	displayName = 'SQL Accounting API';
-	documentationUrl =
-		'https://github.com/laurentyew/n8n-nodes-sqlaccounting';
+	documentationUrl = 'https://github.com/laurentyew/n8n-nodes-sqlaccounting';
 
-	// ── Tells n8n how to inject the platform API key as Bearer token ──────────
-	// This is what allows httpRequestWithAuthentication() to work correctly
-	// and satisfies the no-http-request-with-manual-auth linter rule.
+	// Injects the platform token as a Bearer header on every request made with this credential.
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
@@ -26,24 +21,24 @@ export class SqlAccountingApi implements ICredentialType {
 		},
 	};
 
-	// ── Powers the "Test credential" button in the n8n UI ────────────────────
-	// Calls profile.get (1 credit) to verify both the platform key AND
-	// the SQL Accounting credentials are valid.
+	// Powers the "Test credential" button: calls profile.get to verify both the token and the SQL keys.
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: EDGE_FUNCTION_BASE,
-			url: '/sqlaccount',
+			baseURL: '={{$credentials.proxyBaseUrl}}',
+			url: '/functions/v1/sqlaccount',
 			method: 'POST',
 			body: {
-				access_key: '={{$credentials.sqlAccessKey}}',
-				secret_key: '={{$credentials.sqlSecretKey}}',
-				service: '={{$credentials.service}}',
-				region: '={{$credentials.region}}',
+				contract_version: 1,
+				sql: {
+					access_key: '={{$credentials.sqlAccessKey}}',
+					secret_key: '={{$credentials.sqlSecretKey}}',
+					region: '={{$credentials.region}}',
+					service: '={{$credentials.service}}',
+				},
 				operation: 'profile.get',
-				method: 'GET',
-				path: '/profile',
-				query: '',
-				body: '',
+				path_param: null,
+				query: {},
+				body: null,
 			},
 			json: true,
 		},
@@ -51,14 +46,13 @@ export class SqlAccountingApi implements ICredentialType {
 
 	properties: INodeProperties[] = [
 		{
-			displayName: 'Platform API Key',
+			displayName: 'Platform Token',
 			name: 'platformApiKey',
 			type: 'string',
 			typeOptions: { password: true },
 			default: '',
 			required: true,
-			description:
-				'Your licence key from the SQL Accounting n8n Node portal. Starts with sqlnode_.',
+			description: 'Your subscription token from the SQL Accounting n8n Node portal. Starts with sqlnode_.',
 			placeholder: 'sqlnode_...',
 		},
 		{
@@ -69,7 +63,7 @@ export class SqlAccountingApi implements ICredentialType {
 			default: '',
 			required: true,
 			description: 'Your SQL Accounting API access key from the SQL Account API settings page',
-			placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.sql.my/ACCOUNTAPI',
+			placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.sql.my/APIUSER',
 		},
 		{
 			displayName: 'SQL Secret Key',
@@ -79,25 +73,31 @@ export class SqlAccountingApi implements ICredentialType {
 			default: '',
 			required: true,
 			description:
-				'Your SQL Accounting API secret key. Encrypted by n8n and never stored on our servers.',
+				'Your SQL Accounting API secret key. It is sent with each request over HTTPS, used in memory to sign that single request, and never stored or logged.',
 		},
 		{
 			displayName: 'Service',
 			name: 'service',
 			type: 'string',
-			default: 'sqlaccount',
+			default: DEFAULT_SERVICE,
 			required: true,
-			description:
-				'SigV4 service name. Default is sqlaccount. Only change if instructed by SQL Accounting support.',
+			description: 'SigV4 service name. Only change if instructed by SQL Accounting support.',
 		},
 		{
 			displayName: 'Region',
 			name: 'region',
 			type: 'string',
-			default: 'ap-southeast-5',
+			default: DEFAULT_REGION,
 			required: true,
-			description:
-				'SigV4 region. Default is ap-southeast-5. Only change if instructed by SQL Accounting support.',
+			description: 'SigV4 region. Only change if instructed by SQL Accounting support.',
+		},
+		{
+			displayName: 'Proxy URL',
+			name: 'proxyBaseUrl',
+			type: 'string',
+			default: PROXY_BASE_URL,
+			required: true,
+			description: 'Advanced. Only change to self-host the proxy or for local testing.',
 		},
 	];
 }

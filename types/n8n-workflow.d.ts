@@ -68,26 +68,45 @@ declare module 'n8n-workflow' {
 		properties: INodeProperties[];
 	}
 
+	export interface INode {
+		id: string;
+		name: string;
+		type: string;
+		typeVersion: number;
+		position: number[];
+		parameters: IDataObject;
+	}
+
+	export interface IN8nHelpers {
+		httpRequest(options: IHttpRequestOptions): Promise<any>;
+		httpRequestWithAuthentication: {
+			call(ctx: any, credentialsType: string, options: IHttpRequestOptions): Promise<any>;
+		};
+	}
+
 	export interface IExecuteFunctions {
 		getInputData(): INodeExecutionData[];
 		getNodeParameter(name: string, itemIndex: number, fallback?: any): any;
 		getCredentials(name: string): Promise<IDataObject>;
-		getNode(): any;
+		getNode(): INode;
 		continueOnFail(): boolean;
-		helpers: {
-			httpRequest(options: IHttpRequestOptions): Promise<any>;
-			httpRequestWithAuthentication: {
-				call(
-					ctx: IExecuteFunctions,
-					credentialsType: string,
-					options: IHttpRequestOptions,
-				): Promise<any>;
-			};
-		};
+		helpers: IN8nHelpers;
+	}
+
+	export interface ILoadOptionsFunctions {
+		getNodeParameter(name: string, fallback?: any): any;
+		getCredentials(name: string): Promise<IDataObject>;
+		getNode(): INode;
+		helpers: IN8nHelpers;
 	}
 
 	export interface INodeType {
 		description: INodeTypeDescription;
+		methods?: {
+			loadOptions?: {
+				[key: string]: (this: ILoadOptionsFunctions) => Promise<INodePropertyOptions[]>;
+			};
+		};
 		execute?(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
 	}
 
@@ -99,6 +118,7 @@ declare module 'n8n-workflow' {
 		qs?: { [key: string]: any };
 		json?: boolean;
 		returnFullResponse?: boolean;
+		ignoreHttpStatusErrors?: boolean;
 	}
 
 	export interface IAuthenticateGeneric {
@@ -132,7 +152,8 @@ declare module 'n8n-workflow' {
 	}
 
 	export class NodeOperationError extends Error {
-		constructor(node: any, message: string, options?: { itemIndex?: number });
+		description?: string;
+		constructor(node: any, message: string, options?: { itemIndex?: number; description?: string });
 	}
 
 	export class NodeApiError extends Error {

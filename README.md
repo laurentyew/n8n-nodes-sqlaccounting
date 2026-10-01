@@ -2,7 +2,7 @@
 
 An [n8n](https://n8n.io) community node for the [SQL Accounting](https://www.sql.com.my) REST API (Malaysia).
 
-Connects SQL Accounting to any automation via the SQL Accounting n8n Node platform — a credit-based service that handles SigV4 signing, rate limiting, and usage tracking.
+It connects n8n to SQL Accounting through the SQL Accounting n8n Node service: a subscription proxy that signs your requests (AWS SigV4), enforces fair use and forwards them to `api.sql.my`.
 
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-sqlaccounting)](https://www.npmjs.com/package/n8n-nodes-sqlaccounting)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -11,153 +11,127 @@ Connects SQL Accounting to any automation via the SQL Accounting n8n Node platfo
 
 ## Features
 
-- **81 endpoints** — Sales, Purchase, AR, AP, GL, Stock, Manufacturing, and Reports
-- **Zero runtime dependencies** — uses only Node.js built-ins (required for n8n Cloud)
-- **Auto-pagination** — Return All toggle loops through pages automatically
-- **Guided fields** for master data, raw JSON body editor for transactional documents
-- **Credit-based billing** — buy credits at the portal, spend per API call
+- **81 resources**: master data, sales, purchase, AR, AP, GL, stock and reports.
+- **Typed fields.** Required inputs are shown as real fields. Integers, booleans, dates and decimals are sent in the type the API expects. Enumerations (account type, journal, term type) are dropdowns.
+- **Dropdowns that load from your company.** Fields such as Currency, Terms, Tax, Account, Customer, Supplier, Stock Item and Location list your own records.
+- **Line-item editor** for sales, purchase, stock and journal documents. A raw JSON mode (pre-filled with a template) is available for every document.
+- **Validation before sending.** Missing required fields, bad dates, missing lines, unbalanced journals and non-numeric IDs are reported all at once, before any request is made.
+- **Return All** with correct 50-record paging, a Limit option and a Max Pages safety cap.
+- **Filters** with a per-resource field list. Wildcards (`*term*`) and ranges (`2025-01-01~2025-01-31`) work on SQL Account 5.2025.1061.890 and later.
+- **Zero runtime dependencies.**
 
 ---
 
 ## Prerequisites
 
-1. A running SQL Accounting installation with the REST API enabled
-2. A SQL Accounting API access key and secret key (from SQL Account → Tools → API Settings)
-3. A platform API key from the SQL Accounting n8n Node portal (`sqlnode_...`)
+1. SQL Accounting with the REST API enabled.
+2. A SQL Accounting API **access key** and **secret key** (SQL Account API settings).
+3. A **subscription token** (`sqlnode_...`) from the SQL Accounting n8n Node portal.
 
 ---
 
 ## Installation
 
-### In n8n (recommended)
+In n8n: **Settings → Community Nodes → Install** → `n8n-nodes-sqlaccounting`.
 
-```
-Settings → Community Nodes → Install → n8n-nodes-sqlaccounting
-```
-
-### Self-hosted via CLI
-
-```bash
-npm install n8n-nodes-sqlaccounting
-```
+Self-hosted via CLI: `npm install n8n-nodes-sqlaccounting`.
 
 ---
 
 ## Credentials
 
-Configure a **SQL Accounting API** credential with these five fields:
+Create a **SQL Accounting API** credential:
 
 | Field | Description | Default |
 |-------|-------------|---------|
-| Platform API Key | Your `sqlnode_...` key from the portal | — |
-| SQL Access Key | From SQL Account API settings | — |
-| SQL Secret Key | From SQL Account API settings (encrypted by n8n) | — |
+| Platform Token | Your `sqlnode_...` subscription token | none |
+| SQL Access Key | From SQL Account API settings, format `<key_id>.sql.my/APIUSER` | none |
+| SQL Secret Key | From SQL Account API settings | none |
 | Service | SigV4 service name | `sqlaccount` |
 | Region | SigV4 region | `ap-southeast-5` |
+| Proxy URL | Advanced. Only for self-hosting or local testing | service URL |
 
-Use the **Test credential** button to verify all five values are correct. This sends a `GET /profile` request (costs 1 credit).
+**Test credential** calls `profile.get` and checks the token, the subscription and your SQL keys at once.
 
----
+### How your SQL keys are handled
 
-## Credit Costs
-
-| Operation type | Credits per call |
-|----------------|-----------------|
-| List / Get / Report | 1 |
-| Create | 3 |
-| Update (auto GET + PUT) | 4 total |
-| Delete | 5 |
-
-Return All loops through pages — each page costs 1 credit.
+The node cannot sign requests itself, so your SQL access and secret keys are sent with each request over HTTPS to the proxy. The proxy holds them in memory only long enough to sign that single request. They are never stored and never logged, and request and response bodies are not logged either. The proxy sees the accounting data in transit, so use a SQL Account API user with the minimum rights you need.
 
 ---
 
-## Operations
+## Using the node
 
-### Master Data (guided fields for Create/Update)
+### Records (master data)
 
-`account` `agent` `area` `assetdisposal` `assetgroup` `assetitem` `batch`
-`companycategory` `location` `memberpoint` `pmmethod` `pricetag` `project`
-`shipper` `stockcategory` `stockgroup` `tariff` `tax` `terms` `whtax`
+1. Pick a **Resource** (for example Currency) and an **Operation**.
+2. **Create** shows the required fields as inputs. Everything else is under **Additional Fields**. Use **Extra Fields (JSON)** for anything not listed, such as the `sdsbranch` sub-array on a customer.
+3. **Update** shows **Fields to Update**. Only what you set is sent.
+4. **Get / Update / Delete** need a record identifier. The field is labelled by what the resource uses:
+   - **Code**: the record code, for example `USD`.
+   - **DocKey / AutoKey**: SQL Account's internal numeric ID, for example for Tax, Shipper, Tariff, Batch, Stock Item and Asset records. This is not the code. Use **List** with a filter (for example `code=ST-6%`) and read `autokey` or `dockey` from the result.
 
-### Transactional — Sales
+### Documents (invoices, orders, journals, payments)
 
-`salesinvoice` `salesorder` `salesquotation` `salescreditnote` `salesdebitnote`
-`salescancellednote` `cashsales` `deliveryorder` `extradeliveryorder`
+1. Fill the required header fields (customer or supplier code, date).
+2. Add **Line Items**.
+3. Or switch on **Use Raw JSON Instead**. The body is pre-filled with a template for that document type.
 
-### Transactional — Purchase
+Example, a journal entry: set Document Date, add two lines (`Account`, `Debit`/`Credit`). Totals must balance, otherwise the node tells you before sending.
 
-`purchaseinvoice` `purchaseorder` `purchaserequest` `purchasereturned`
-`purchasedebitnote` `purchasecancellednote` `cashpurchase` `goodsreceived`
-`extragoodsreceived`
+### Lists, filters and paging
 
-### Transactional — Accounts Receivable
+- **Return All** fetches every page (50 records each), up to **Max Pages**.
+- Without Return All, **Limit** (1 to 50) and **Offset** apply.
+- **Filters** lists the fields of the resource. **Custom Filters** takes any API field name.
 
-`customer` `customerinvoice` `customercreditnote` `customerdebitnote`
-`customerpayment` `customerdeposit` `customerrefund` `customercontra`
+### Deleting
 
-### Transactional — Accounts Payable
-
-`supplier` `supplierinvoice` `suppliercreditnote` `supplierdebitnote`
-`supplierpayment` `supplierdeposit` `supplierrefund` `suppliercontra`
-
-### Transactional — GL / Stock / Manufacturing
-
-`journalentry` `paymentvoucher` `receiptvoucher` `bankadjustment` `stockitem`
-`stockadjustment` `stockissue` `stockreceived` `stocktransfer` `assembly`
-`disassembly` `joborder` `itemtemplate` `currency`
-
-### Reports (read-only)
-
-`profile` `version` `stockaging` `stockanalysis` `stockbalanceinquiry`
-`stockbatchexpiry` `stockcard` `stockcardqty` `stockmonthendbalance`
-`stockphysicalworksheet` `stockreorderadvice` `stockserialnumberconflict`
-`stockserialnumberoutstanding`
+Delete returns `{ "success": true, "resource": "...", "deleted": <id> }`.
 
 ---
 
-## JSON Body Example — Sales Invoice
+## Troubleshooting
 
-Use this as a starting point for the **Request Body (JSON)** field:
+| Error code | Meaning | Fix |
+|------------|---------|-----|
+| `invalid_token` | Token wrong or revoked | Check Platform Token in the credential, or generate a new one in the portal |
+| `subscription_inactive` | No active subscription | Renew in the portal |
+| `rate_limited` | Over 120 requests per minute per token | Wait and retry, or slow the workflow |
+| `sql_auth_failed` | SQL Account rejected the keys | Check SQL Access Key and Secret Key |
+| `validation_failed` | Input rejected (field and hint are shown) | Fix the named field |
+| `upstream_error` | SQL Account returned an error | Read the message and the upstream status |
+| `unsupported_version` | Node and proxy versions differ | Update the node |
+| `internal_error` | Proxy bug | Report it with the request id |
 
-```json
-{
-  "docno": "IV-00001",
-  "docdate": "2026-01-15",
-  "code": "CUSTOMER001",
-  "description": "Monthly consulting services",
-  "currencycode": "MYR",
-  "currencyrate": 1,
-  "docamt": 1060.00,
-  "sdsdocdetail": [
-    {
-      "itemcode": "SVC001",
-      "description": "Consulting service",
-      "qty": 1,
-      "uom": "UNIT",
-      "unitprice": 1000.00,
-      "disc": 0,
-      "tax": "SR6",
-      "taxamt": 60.00,
-      "localamt": 1000.00
-    }
-  ]
-}
+Common SQL Account messages:
+
+- `not a valid floating point value`: a code was used where an AutoKey or DocKey is required.
+- Empty bodies crash the SQL Account backend, so the node never sends them.
+
+---
+
+## Development
+
+```bash
+npm install --legacy-peer-deps
+npm test               # unit and integration tests
+npm run test:cov       # with coverage
+npm run lint
+npm run build
 ```
 
----
+Local testing without the cloud service:
 
-## Error Reference
+```bash
+npm run mock-proxy     # contract-compliant mock on http://localhost:8787, token sqlnode_test
+```
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| Authentication failed | Invalid platform API key | Check the Platform API Key in your credential |
-| Insufficient credits | Balance is zero | Top up at the portal |
-| 4xx from SQL Accounting | Bad request data | Check your JSON body or Record ID |
-| 5xx from SQL Accounting | SQL Accounting server error | No credit charged — retry later |
+Then create a credential with Platform Token `sqlnode_test`, any SQL keys, and Proxy URL `http://localhost:8787`.
+
+The contract between the node and the proxy is in [contract/CONTRACT.md](contract/CONTRACT.md). The resource and operation list is generated from [contract/operations.json](contract/operations.json) (`npm run gen:registry`); tests fail if the two drift.
 
 ---
 
 ## License
 
-[MIT](LICENSE)
+MIT

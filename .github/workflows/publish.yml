@@ -30,6 +30,9 @@ jobs:
         # n8n-workflow is NOT installed — types come from ./types/n8n-workflow.d.ts
         # This avoids the isolated-vm native build entirely
 
+      - name: Run tests
+        run: npm test
+
       - name: Build
         run: npm run build
 
