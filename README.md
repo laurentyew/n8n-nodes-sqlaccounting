@@ -150,6 +150,8 @@ There are two ways to give an **AI Agent** access to SQL Accounting.
 
 Add **SQL Accounting AI** to the agent's tools. The model chooses the resource and the operation itself, so you do not need a separate tool per task.
 
+In the tool's settings, click the ✦ ("Let the model define this parameter") button next to **Operation**, **Resource Name**, **Record ID**, **Filters**, **Body**, **Offset** and **Max Records**. Leave **Allow Changes** and **Return Errors to the AI** alone; they are fixed by you.
+
 - **Describe** is the first step for the model. With an empty resource it lists every resource. With a resource it returns the fields (required ones, types, allowed values), the record ID type and, for documents, an example body.
 - **List** and **Get** read records. Filters are a JSON object such as `{"code":"CUS*"}`. **Max Records** (default 10, at most 50) keeps results small; if more exist, the result ends with a note giving the next offset.
 - Values are checked before anything is sent, and problems come back to the model as readable errors so it can correct itself.
