@@ -1,15 +1,10 @@
-import type {
-	IExecuteFunctions,
-	IHttpRequestOptions,
-	ILoadOptionsFunctions,
-	ISupplyDataFunctions,
-} from 'n8n-workflow';
+import type { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { PROXY_PATH } from './config';
 import { isProxyResponse, ProxyRequest, ProxyResponse, ProxySuccess } from './contractTypes';
 import { ProxyCallError } from './errors';
 
-type Ctx = IExecuteFunctions | ILoadOptionsFunctions | ISupplyDataFunctions;
+type Ctx = IExecuteFunctions | ILoadOptionsFunctions;
 
 export async function callProxy(
 	ctx: Ctx,

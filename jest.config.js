@@ -10,8 +10,6 @@ module.exports = {
 		'!nodes/SqlAccounting/registry.generated.ts',
 		'!nodes/SqlAccounting/SqlAccounting.node.ts',
 		'!nodes/SqlAccounting/ui/**',
-		'nodes/SqlAccountingTool/**/*.ts',
-		'!nodes/SqlAccountingTool/SqlAccountingTool.node.ts',
 	],
 	coverageThreshold: { global: { statements: 80, branches: 70, functions: 80, lines: 80 } },
 };

@@ -72,7 +72,6 @@ declare module 'n8n-workflow' {
 		defaults: { name: string; [key: string]: any };
 		inputs: string[];
 		outputs: string[];
-		outputNames?: string[];
 		credentials?: Array<{ name: string; required?: boolean }>;
 		properties: INodeProperties[];
 	}
@@ -109,18 +108,6 @@ declare module 'n8n-workflow' {
 		helpers: IN8nHelpers;
 	}
 
-	export interface ISupplyDataFunctions {
-		getNodeParameter(name: string, itemIndex: number, fallback?: any): any;
-		getCredentials(name: string): Promise<IDataObject>;
-		getNode(): INode;
-		helpers: IN8nHelpers;
-	}
-
-	export interface SupplyData {
-		response: unknown;
-		closeFunction?: () => Promise<void>;
-	}
-
 	export interface INodeType {
 		description: INodeTypeDescription;
 		methods?: {
@@ -128,7 +115,6 @@ declare module 'n8n-workflow' {
 				[key: string]: (this: ILoadOptionsFunctions) => Promise<INodePropertyOptions[]>;
 			};
 		};
-		supplyData?(this: ISupplyDataFunctions, itemIndex: number): Promise<SupplyData>;
 		execute?(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
 	}
 

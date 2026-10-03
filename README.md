@@ -142,6 +142,17 @@ The customer `CUS-01` and the stock item `STK-001` must already exist in SQL Acc
 
 ---
 
+## Using the node with an AI Agent
+
+The node can be used as a tool by an **AI Agent** (n8n offers it as "SQL Accounting Tool" in the agent's tool list). The agent can then look up customers, stock items and so on in SQL Accounting.
+
+- Choose the **Resource** and **Operation** yourself in the tool's settings; don't let the model pick them. A read-only setup is **List** or **Get** on the resources you want the agent to see.
+- Let the model fill only the inputs it should control, such as a filter value, using n8n's "Let the model define this parameter" option.
+- Do not give an agent **Create**, **Update** or **Delete** unless you want it to change your accounts. Documents posted to SQL Account are real accounting entries.
+- Keep **Limit** small (the API returns at most 50 records per request) so the agent does not receive large result sets.
+
+---
+
 ## Troubleshooting
 
 | Error code | Meaning | Fix |
@@ -181,22 +192,6 @@ npm run mock-proxy     # contract-compliant mock on http://localhost:8787, token
 Then create a credential with Platform Token `sqlnode_test`, any SQL keys, and Proxy URL `http://localhost:8787`.
 
 The contract between the node and the proxy is in [contract/CONTRACT.md](contract/CONTRACT.md). The resource and operation list is generated from [contract/operations.json](contract/operations.json) (`npm run gen:registry`); tests fail if the two drift.
-
----
-
-## Use with the n8n AI Agent
-
-Add a **SQL Accounting Tool** node, pick a function, and connect it to the **Tools** input of an AI Agent. Add one tool node per function you want the agent to have.
-
-| Function | Inputs | Returns |
-|---|---|---|
-| searchCustomers | `code`, `companyname`, `limit` | Matching customers |
-| searchSuppliers | `code`, `companyname`, `limit` | Matching suppliers |
-| searchStockItems | `code`, `description`, `limit` | Matching stock items (includes `dockey`) |
-| getCustomer | `code` | One customer |
-| getSupplier | `code` | One supplier |
-
-All functions are read-only. `*` works as a wildcard in filters. `limit` defaults to 10 (max 50).
 
 ---
 
