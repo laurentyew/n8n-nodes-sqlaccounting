@@ -184,6 +184,22 @@ The contract between the node and the proxy is in [contract/CONTRACT.md](contrac
 
 ---
 
+## Use with the n8n AI Agent
+
+Add a **SQL Accounting Tool** node, pick a function, and connect it to the **Tools** input of an AI Agent. Add one tool node per function you want the agent to have.
+
+| Function | Inputs | Returns |
+|---|---|---|
+| searchCustomers | `code`, `companyname`, `limit` | Matching customers |
+| searchSuppliers | `code`, `companyname`, `limit` | Matching suppliers |
+| searchStockItems | `code`, `description`, `limit` | Matching stock items (includes `dockey`) |
+| getCustomer | `code` | One customer |
+| getSupplier | `code` | One supplier |
+
+All functions are read-only. `*` works as a wildcard in filters. `limit` defaults to 10 (max 50).
+
+---
+
 ## License
 
 MIT

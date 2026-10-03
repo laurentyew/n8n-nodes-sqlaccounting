@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- New **SQL Accounting Tool** node for the n8n AI Agent. Read-only lookups, one function per tool node: `searchCustomers`, `searchSuppliers`, `searchStockItems`, `getCustomer`, `getSupplier`.
+- Search returns one page of at most `limit` records (default 10, max 50). Errors are returned to the agent as JSON so it can correct itself.
+- `@langchain/core` and `zod` are optional peer dependencies (n8n provides them).
+
 ## 1.1.3
 
 - Fix: 1.1.2 failed to load on n8n releases that do not export `NodeConnectionTypes` ("Class could not be found"). The node now falls back to the `main` connection type there.
