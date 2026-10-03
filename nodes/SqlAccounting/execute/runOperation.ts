@@ -26,7 +26,7 @@ function readPathParam(ctx: IExecuteFunctions, i: number, op: OperationDef): str
 	return parsePathParam(op.pathParam, raw, pathParamLabel(op.pathParam));
 }
 
-function buildRequest(
+export function buildRequest(
 	op: OperationDef,
 	creds: SqlCredentials,
 	pathParam: string | number | null,
