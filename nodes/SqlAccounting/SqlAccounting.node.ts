@@ -1,13 +1,11 @@
 import type { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
+import { MAIN_CONNECTION } from './connection';
 import { ValidationError } from './errors';
 import { getOperation } from './registry';
 import { errorToJson, runOperation, SqlCredentials } from './execute/runOperation';
 import { lookupMethods } from './lookups';
 import { buildProperties } from './ui/properties';
-
-// Older n8n releases do not export NodeConnectionTypes; fall back to the literal they used.
-const MAIN_CONNECTION = NodeConnectionTypes?.Main ?? 'main';
 
 export class SqlAccounting implements INodeType {
 	description: INodeTypeDescription = {

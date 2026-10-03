@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-sqlaccounting",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "n8n community node for the SQL Accounting REST API (Malaysia), via the SQL Accounting n8n Node subscription service.",
   "keywords": [
     "n8n-community-node-package",
@@ -44,7 +44,8 @@
       "dist/credentials/SqlAccountingApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/SqlAccounting/SqlAccounting.node.js"
+      "dist/nodes/SqlAccounting/SqlAccounting.node.js",
+      "dist/nodes/SqlAccountingAi/SqlAccountingAi.node.js"
     ]
   },
   "devDependencies": {

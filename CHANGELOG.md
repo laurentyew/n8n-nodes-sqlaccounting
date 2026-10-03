@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- New node **SQL Accounting AI**: one tool for AI Agents where the model chooses the resource and operation. It can Describe resources and fields, List and Get records, and (only when Allow Changes is on) create, update and delete. Read-only by default; errors are returned to the model as data. No new dependencies.
+
 ## 1.1.4
 
 - Documentation: how to use the node as a read-only tool for the n8n AI Agent (the node already supports tool mode through `usableAsTool`).

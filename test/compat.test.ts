@@ -25,4 +25,16 @@ describe('node loads when n8n-workflow has no NodeConnectionTypes', () => {
 			expect(new SqlAccounting().description.inputs).toEqual(['main-from-n8n']);
 		});
 	});
+
+	test('the AI node also falls back to "main"', () => {
+		jest.isolateModules(() => {
+			jest.doMock('n8n-workflow', () => ({
+				NodeOperationError: class extends Error {},
+				NodeApiError: class extends Error {},
+			}));
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const { SqlAccountingAi } = require('../nodes/SqlAccountingAi/SqlAccountingAi.node');
+			expect(new SqlAccountingAi().description.inputs).toEqual(['main']);
+		});
+	});
 });

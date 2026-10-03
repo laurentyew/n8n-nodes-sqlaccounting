@@ -144,12 +144,21 @@ The customer `CUS-01` and the stock item `STK-001` must already exist in SQL Acc
 
 ## Using the node with an AI Agent
 
-The node can be used as a tool by an **AI Agent** (n8n offers it as "SQL Accounting Tool" in the agent's tool list). The agent can then look up customers, stock items and so on in SQL Accounting.
+There are two ways to give an **AI Agent** access to SQL Accounting.
 
-- Choose the **Resource** and **Operation** yourself in the tool's settings; don't let the model pick them. A read-only setup is **List** or **Get** on the resources you want the agent to see.
-- Let the model fill only the inputs it should control, such as a filter value, using n8n's "Let the model define this parameter" option.
-- Do not give an agent **Create**, **Update** or **Delete** unless you want it to change your accounts. Documents posted to SQL Account are real accounting entries.
-- Keep **Limit** small (the API returns at most 50 records per request) so the agent does not receive large result sets.
+### 1. One tool for everything: **SQL Accounting AI** (recommended)
+
+Add **SQL Accounting AI** to the agent's tools. The model chooses the resource and the operation itself, so you do not need a separate tool per task.
+
+- **Describe** is the first step for the model. With an empty resource it lists every resource. With a resource it returns the fields (required ones, types, allowed values), the record ID type and, for documents, an example body.
+- **List** and **Get** read records. Filters are a JSON object such as `{"code":"CUS*"}`. **Max Records** (default 10, at most 50) keeps results small; if more exist, the result ends with a note giving the next offset.
+- Values are checked before anything is sent, and problems come back to the model as readable errors so it can correct itself.
+- **Read-only by default.** Create, update and delete are rejected unless you switch **Allow Changes** on. The model cannot change that setting. Turn it on only if you want the agent to post real accounting entries, and test with a copy of your data first.
+- Set the tool's description in the agent so it knows to call **Describe** first.
+
+### 2. One tool per task: the **SQL Accounting** node
+
+The main node also works as an agent tool. Choose the **Resource** and **Operation** yourself (they cannot be filled by the model) and let the model fill only the inputs you pick with n8n's "Let the model define this parameter" option. Use **List** or **Get** for read-only access.
 
 ---
 

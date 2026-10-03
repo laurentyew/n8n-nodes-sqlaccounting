@@ -26,7 +26,7 @@ function readPathParam(ctx: IExecuteFunctions, i: number, op: OperationDef): str
 	return parsePathParam(op.pathParam, raw, pathParamLabel(op.pathParam));
 }
 
-function buildRequest(
+export function buildRequest(
 	op: OperationDef,
 	creds: SqlCredentials,
 	pathParam: string | number | null,
@@ -89,7 +89,7 @@ export function errorToJson(error: unknown): IDataObject {
 		return { error: error.message, code: 'validation_failed', issues: error.issues };
 	}
 	if (error instanceof ProxyCallError) {
-		return { error: error.message, code: error.proxyCode, field: error.field ?? null };
+		return { error: error.message, code: error.proxyCode, field: error.field ?? null, details: error.description ?? null };
 	}
 	return { error: error instanceof Error ? error.message : String(error) };
 }
