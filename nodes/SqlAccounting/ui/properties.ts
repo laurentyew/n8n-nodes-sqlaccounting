@@ -30,23 +30,40 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const FILTER_HINT =
 	'Supports wildcards (*term*) and ranges (2025-01-01~2025-01-31) on SQL Account 5.2025.1061.890 and later.';
 
-const KIND_ORDER: Record<string, number> = { master: 0, transactional: 1, report: 2 };
 const KIND_LABEL: Record<string, string> = { master: 'Master data', transactional: 'Document', report: 'Report' };
+
+// Dropdown sections, in display order. Labels prefix each resource so related ones sort together and filter by typing.
+const SECTION_ORDER = ['sales', 'purchase', 'ar', 'ap', 'gl', 'stock', 'master', 'report'];
+const SECTION_LABEL: Record<string, string> = {
+	sales: 'Sales Documents',
+	purchase: 'Purchase Documents',
+	ar: 'AR Customer Ledger',
+	ap: 'AP Supplier Ledger',
+	gl: 'GL Journals & Vouchers',
+	stock: 'Stock Movements',
+	master: 'Master Data',
+	report: 'Reports',
+};
+
+const sectionOf = (r: ResourceDef): string => (r.kind === 'transactional' ? r.operations[0]?.group ?? 'master' : r.kind);
 
 const showOp = (operation: string[], extra: Record<string, Array<string | number | boolean>> = {}) => ({
 	show: { operation, ...extra },
 });
 
 function resourceProperty(): INodeProperties {
-	const sorted = [...RESOURCE_DEFS].sort(
-		(a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.name.localeCompare(b.name),
-	);
+	const rank = (r: ResourceDef): number => SECTION_ORDER.indexOf(sectionOf(r));
+	const sorted = [...RESOURCE_DEFS].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
 	return {
 		displayName: 'Resource',
 		name: 'resource',
 		type: 'options',
 		noDataExpression: true,
-		options: sorted.map((r) => ({ name: r.name, value: r.value, description: KIND_LABEL[r.kind] })),
+		options: sorted.map((r) => ({
+			name: `${SECTION_LABEL[sectionOf(r)]} › ${r.name}`,
+			value: r.value,
+			description: KIND_LABEL[r.kind],
+		})),
 		default: 'profile',
 		required: true,
 	};

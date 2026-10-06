@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- The Resource dropdown is now grouped into sections (Sales Documents, Purchase Documents, AR Customer Ledger, AP Supplier Ledger, GL Journals & Vouchers, Stock Movements, Master Data, Reports), sorted A-Z within each, so you can find a resource by typing its section. Resource values are unchanged; existing workflows keep working.
+
 ## 1.2.0
 
 - New node **SQL Accounting AI**: one tool for AI Agents where the model chooses the resource and operation. It can Describe resources and fields, List and Get records, and (only when Allow Changes is on) create, update and delete. Read-only by default; errors are returned to the model as data. No new dependencies.
