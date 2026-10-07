@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
+- Removed the **SQL Accounting AI** node (added in 1.2.0). To give an AI Agent access, use the **SQL Accounting** node as a tool; see "Using the node with an AI Agent" in the README. Existing workflows that use the SQL Accounting node are unaffected.
+
 ## 1.2.1
 
 - The Resource dropdown is now grouped into sections (Sales Documents, Purchase Documents, AR Customer Ledger, AP Supplier Ledger, GL Journals & Vouchers, Stock Movements, Master Data, Reports), sorted A-Z within each, so you can find a resource by typing its section. Resource values are unchanged; existing workflows keep working.
